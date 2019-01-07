@@ -6,6 +6,8 @@ class EventManager
   def initialize
     @content = nil
     @queue_count = 0
+    @results = nil
+    @table = [["LAST NAME","FIRST NAME","EMAIL","ZIPCODE","CITY","STATE","ADDRESS","PHONE"]]
   end
 
   def load_content(file)
@@ -17,6 +19,19 @@ class EventManager
       p @queue_count
     elsif action == "clear"
       @queue_count = 0
+    elsif action == "print"
+      @results.each do |row|
+        @table << [
+                    row[:last_name],
+                    row[:first_name],
+                    row[:email_address],
+                    row[:zipcode],
+                    row[:city],
+                    row[:street],
+                    row[:homephone]
+                  ]
+      end
+      @table.each { |table_row| puts table_row.join("\t\t") }
     end
   end
 
@@ -33,11 +48,11 @@ class EventManager
     if command[0].downcase == "load"
       @content = load_content(command[1])
     elsif command[0].downcase == "find"
-      results = @content.find_all do |row|
+      @results = @content.find_all do |row|
         first_name = row[:first_name]
         first_name.capitalize.chomp == command[2].capitalize
       end
-      @queue_count = results.count
+      @queue_count = @results.count
     elsif command[0].downcase == "queue"
       queue_flow(command[1].downcase)
     elsif command[0].downcase == "help"
