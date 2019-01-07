@@ -74,8 +74,8 @@ class EventManager
       @content = load_content
     elsif command[0].downcase == "find"
       @results = @content.find_all do |row|
-        first_name = row[:first_name]
-        first_name.capitalize.chomp == command[2].capitalize
+        searched_value = row[command[1].to_sym]
+        searched_value.capitalize.chomp == command[2].capitalize
       end
       @queue_count = @results.count
     elsif command[0].downcase == "queue"
