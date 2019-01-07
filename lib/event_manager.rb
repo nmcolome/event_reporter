@@ -1,6 +1,7 @@
 class EventManager
   require 'pry'
   require 'csv'
+  require './lib/commands_list.rb'
 
   def initialize
     @content = nil
@@ -19,17 +20,29 @@ class EventManager
     end
   end
 
+  def help_flow(command)
+    text = CommandList.new
+    if command.empty?
+      puts text.list
+    else
+      puts text.flow(command.join(" "))
+    end
+  end
+
   def flow_control(command)
     if command[0].downcase == "load"
       @content = load_content(command[1])
     elsif command[0].downcase == "find"
       results = @content.find_all do |row|
         first_name = row[:first_name]
-        first_name == command[2].capitalize
+        first_name.capitalize.chomp == command[2].capitalize
       end
       @queue_count = results.count
     elsif command[0].downcase == "queue"
       queue_flow(command[1].downcase)
+    elsif command[0].downcase == "help"
+      command.shift
+      help_flow(command)
     end
   end
 end
