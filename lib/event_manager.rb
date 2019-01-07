@@ -7,11 +7,26 @@ class EventManager
     @content = nil
     @queue_count = 0
     @results = nil
-    @table = [["LAST NAME","FIRST NAME","EMAIL","ZIPCODE","CITY","STATE","ADDRESS","PHONE"]]
+    @header = [["LAST NAME","FIRST NAME","EMAIL","ZIPCODE","CITY","STATE","ADDRESS","PHONE"]]
+    @table = []
   end
 
-  def load_content(file)
-    CSV.open "./#{file}", headers: true, header_converters: :symbol
+  def load_content
+    # CSV.open "./#{file}", headers: true, header_converters: :symbol
+    CSV.open "./full_event_attendees.csv", headers: true, header_converters: :symbol
+  end
+
+  def attributes
+    {
+      "last_name": 0,
+      "first_name": 1,
+      "email": 2,
+      "zipcode": 3,
+      "city": 4,
+      "state": 5,
+      "address": 6,
+      "phone": 7
+    }
   end
 
   def queue_flow(action)
@@ -20,18 +35,28 @@ class EventManager
     elsif action == "clear"
       @queue_count = 0
     elsif action == "print"
-      @results.each do |row|
-        @table << [
-                    row[:last_name],
-                    row[:first_name],
-                    row[:email_address],
-                    row[:zipcode],
-                    row[:city],
-                    row[:street],
-                    row[:homephone]
-                  ]
-      end
+      build_table
+      @table.unshift(@header)
       @table.each { |table_row| puts table_row.join("\t\t") }
+    else
+      build_table
+      sorted = @table.sort_by { |table_row| table_row[attributes[action.to_sym]]}
+      sorted.unshift(@header)
+      sorted.each { |table_row| puts table_row.join("\t\t") }
+    end
+  end
+
+  def build_table
+    @results.each do |row|
+      @table << [
+                  row[:last_name],
+                  row[:first_name],
+                  row[:email_address],
+                  row[:zipcode],
+                  row[:city],
+                  row[:street],
+                  row[:homephone]
+                ]
     end
   end
 
@@ -46,7 +71,7 @@ class EventManager
 
   def flow_control(command)
     if command[0].downcase == "load"
-      @content = load_content(command[1])
+      @content = load_content
     elsif command[0].downcase == "find"
       @results = @content.find_all do |row|
         first_name = row[:first_name]
@@ -54,7 +79,7 @@ class EventManager
       end
       @queue_count = @results.count
     elsif command[0].downcase == "queue"
-      queue_flow(command[1].downcase)
+      queue_flow(command[-1].downcase)
     elsif command[0].downcase == "help"
       command.shift
       help_flow(command)
