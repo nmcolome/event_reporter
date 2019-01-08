@@ -52,7 +52,11 @@ class EventManager
         @table.each { |table_row| puts table_row.join("\t\t") }
       end
     elsif action[1] == "save"
-      CSV.open "./#{filename}"
+      CSV.open("./#{action[-1]}", "wb") do |csv|
+        @table.each do |row|
+          csv << row
+        end
+      end
     end
   end
 
