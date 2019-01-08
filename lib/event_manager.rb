@@ -7,7 +7,7 @@ class EventManager
     @content = nil
     @queue_count = 0
     @results = nil
-    @header = [["LAST NAME","FIRST NAME","EMAIL","ZIPCODE","CITY","STATE","ADDRESS","PHONE"]]
+    @header = ["LAST NAME","FIRST NAME","EMAIL","ZIPCODE","CITY","STATE","ADDRESS","PHONE"]
   end
 
   def load_content
